@@ -16,6 +16,9 @@ controls:
   scripts:
     - path: ../lib/macos/scripts/set-dns-cloudflare.sh
 software:
+  packages:
+    - path: ../lib/macos/software/zoom.yml
+      self_service: true
 team_settings:
   webhook_settings:
     failing_policies_webhook:
