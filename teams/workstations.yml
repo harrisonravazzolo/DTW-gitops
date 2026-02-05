@@ -9,7 +9,7 @@ controls:
         labels_include_all:
           - Engineering department
   macos_updates:
-    deadline: "2026-04-31"
+    deadline: "2026-04-29"
     minimum_version: "26.0"
 software:
 team_settings:
