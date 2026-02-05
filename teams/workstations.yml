@@ -1,6 +1,7 @@
 name: "💻 Workstations"
 policies:
   - path: ../lib/windows/policies/all-windows-updates-installed.policies.yml
+  - path: ../lib/macos/policies/dns-resolvers.policies.yml
 queries:
 agent_options:
 controls:
@@ -12,6 +13,8 @@ controls:
   macos_updates:
     deadline: "2026-04-29"
     minimum_version: "26.0"
+  scripts:
+    - path: ../lib/macos/scripts/set-dns-cloudflare.sh
 software:
 team_settings:
   webhook_settings:
