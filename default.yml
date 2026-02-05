@@ -1,0 +1,13 @@
+# default.yml controls global settings and policies/queries that run on all hosts ("All teams").
+
+policies:
+queries:
+agent_options:
+controls:
+org_settings:
+  server_settings:
+    server_url: $FLEET_URL
+  org_info:
+    org_name: Fleet
+  secrets:
+    - secret: "REPLACE_WITH_ENVIRONMENT_VARIABLE"
