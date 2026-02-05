@@ -13,6 +13,10 @@ org_settings:
   server_settings:
     server_url: $FLEET_URL
   org_info:
-    org_name: Fleet
+    org_name: Detroit GitOps
+  webhook_settings:
+    activities_webhook:
+      enable_activities_webhook: true
+      destination_url: https://webhook.site/946f9dfb-ebae-43ef-809e-d5cb707ad20a
   secrets:
     - secret: "REPLACE_WITH_ENVIRONMENT_VARIABLE"
