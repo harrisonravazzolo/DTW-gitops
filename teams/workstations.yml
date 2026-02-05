@@ -1,5 +1,6 @@
 name: "💻 Workstations"
 policies:
+  - path: ../lib/windows/policies/all-windows-updates-installed.policies.yml
 queries:
 agent_options:
 controls:
@@ -13,5 +14,12 @@ controls:
     minimum_version: "26.0"
 software:
 team_settings:
+  webhook_settings:
+    failing_policies_webhook:
+      enable_failing_policies_webhook: true
+      destination_url: https://webhook.site/946f9dfb-ebae-43ef-809e-d5cb707ad20a
+      host_batch_size: 0
+      policy_ids:
+
   secrets:
     - secret: "$FLEET_WORKSTATIONS_ENROLL_SECRET"
