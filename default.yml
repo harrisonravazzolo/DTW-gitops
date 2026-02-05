@@ -1,5 +1,7 @@
 # default.yml controls global settings and policies/queries that run on all hosts ("All teams").
 
+labels:
+  - path: ./lib/all/labels/global-labels.yml
 policies:
 queries:
 agent_options:
