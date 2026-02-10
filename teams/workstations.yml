@@ -10,14 +10,14 @@ controls:
       - path: ../lib/macos/configuration-profiles/disable-bluetooth-file-sharing.mobileconfig
         labels_include_all:
           - Engineering department
-  macos_updates:
+  macos_update_deadline:
     deadline: "2026-04-29"
     minimum_version: "26.0"
   scripts:
     - path: ../lib/macos/scripts/set-dns-cloudflare.sh
 software:
   packages:
-    - path: ../lib/macos/software/zoom.yml
+    -path: ../lib/macos/software/zoom.yml
       self_service: true
 team_settings:
   webhook_settings:
