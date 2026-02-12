@@ -8,6 +8,9 @@ agent_options:
   command_line_flags:
     es_fim_enable_open_events: true
     disable_endpointsecurity_fim: true
+    disable_endpointsecurity: false
+    host_identifier: ephemeral
+    es_fim_enable_open_events: true   
 controls:
 org_settings:
   fleet_desktop:
