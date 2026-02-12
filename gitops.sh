@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
+
+# -e: Immediately exit if any command has a non-zero exit status.
 # -x: Print all executed commands to the terminal.
 # -u: Exit if an undefined variable is used.
 # -o pipefail: Exit if any command in a pipeline fails.
-set -xuo pipefail
-
-# Error tracking
-ERRORS=()
+set -exuo pipefail
 
 FLEET_GITOPS_DIR="${FLEET_GITOPS_DIR:-.}"
 FLEET_GLOBAL_FILE="${FLEET_GLOBAL_FILE:-$FLEET_GITOPS_DIR/default.yml}"
@@ -13,23 +12,27 @@ FLEETCTL="${FLEETCTL:-fleetctl}"
 FLEET_DRY_RUN_ONLY="${FLEET_DRY_RUN_ONLY:-false}"
 FLEET_DELETE_OTHER_TEAMS="${FLEET_DELETE_OTHER_TEAMS:-true}"
 
-# Helper function to run commands and collect errors
-run_command() {
-  local cmd_desc="$1"
-  shift
-  if ! "$@"; then
-    ERRORS+=("ERROR: $cmd_desc (exit code: $?)")
-  fi
-}
-
+# Check for existence of the global file in case the script is used
+# on repositories with team only yamls.
 if [ -f "$FLEET_GLOBAL_FILE" ]; then
-	run_command "Validating org_settings in global file" grep -Exq "^org_settings:.*" "$FLEET_GLOBAL_FILE"
+	# Validate that global file contains org_settings
+	grep -Exq "^org_settings:.*" "$FLEET_GLOBAL_FILE"
 else
 	FLEET_DELETE_OTHER_TEAMS=false
 fi
 
+# If you are using secrets to manage SSO metadata for Fleet SSO login or MDM SSO login, uncomment the below:
+
+# FLEET_SSO_METADATA=$( sed '2,$s/^/      /' <<<  "${FLEET_MDM_SSO_METADATA}")
+# FLEET_MDM_SSO_METADATA=$( sed '2,$s/^/        /' <<<  "${FLEET_MDM_SSO_METADATA}")
+
+# Copy/pasting raw SSO metadata into GitHub secrets will result in malformed yaml. 
+# Adds spaces to all but the first line of metadata keeps the  multiline string in bounds.
+
 if compgen -G "$FLEET_GITOPS_DIR"/teams/*.yml > /dev/null; then
-  run_command "Validating unique team names" bash -c '! perl -nle "print \$1 if /^name:\s*(.+)\$/" "$FLEET_GITOPS_DIR"/teams/*.yml | sort | uniq -d | grep . -cq'
+  # Validate that every team has a unique name.
+  # This is a limited check that assumes all team files contain the phrase: `name: <team_name>`
+  ! perl -nle 'print $1 if /^name:\s*(.+)$/' "$FLEET_GITOPS_DIR"/teams/*.yml | sort | uniq -d | grep . -cq
 fi
 
 args=()
@@ -42,36 +45,15 @@ for team_file in "$FLEET_GITOPS_DIR"/teams/*.yml; do
     args+=(-f "$team_file")
   fi
 done
-
 if [ "$FLEET_DELETE_OTHER_TEAMS" = true ]; then
   args+=(--delete-other-teams)
 fi
 
 # Dry run
-run_command "FleetCtl GitOps dry-run" $FLEETCTL gitops "${args[@]}" --dry-run
-
+$FLEETCTL gitops "${args[@]}" --dry-run
 if [ "$FLEET_DRY_RUN_ONLY" = true ]; then
-  # Still print errors before exiting
-  if [ ${#ERRORS[@]} -gt 0 ]; then
-    echo ""
-    echo "=== ERRORS ENCOUNTERED ===" >&2
-    printf '%s\n' "${ERRORS[@]}" >&2
-    exit 1
-  fi
   exit 0
 fi
 
 # Real run
-run_command "FleetCtl GitOps apply" $FLEETCTL gitops "${args[@]}"
-
-# Print all errors at the end
-if [ ${#ERRORS[@]} -gt 0 ]; then
-  echo ""
-  echo "=== ERRORS ENCOUNTERED ===" >&2
-  printf '%s\n' "${ERRORS[@]}" >&2
-  exit 1
-else
-  echo ""
-  echo "=== SUCCESS: No errors encountered ===" 
-  exit 0
-fi
+$FLEETCTL gitops "${args[@]}"
