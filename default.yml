@@ -5,6 +5,9 @@ labels:
 policies:
 queries:
 agent_options:
+  command_line_flags:
+    es_fim_enable_open_events: true
+    disable_endpointsecurity_fim: true
 controls:
 org_settings:
   fleet_desktop:
